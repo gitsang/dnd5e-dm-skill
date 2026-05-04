@@ -4,9 +4,9 @@
 
 **Goal:** Build a `dnd5e-dm` skill that runs DnD5e sessions as a rules-aware DM assistant with persistent state, auditable dice, module fidelity checks, and minimal deterministic combat/resource tools.
 
-**Architecture:** Implement a discoverable skill under `.agents/skills/dnd5e-dm/`, with reusable scripts and references bundled beside `SKILL.md`. The skill treats a campaign vault as source of truth and delegates dice, initiative, turn advancement, HP/resource mutation, and audit logging to Python CLI scripts.
+**Architecture:** Implement a discoverable skill under `.agents/skills/dnd5e-dm/`, with a Go binary CLI and references bundled beside `SKILL.md`. The skill treats a campaign vault as source of truth and delegates dice, initiative, turn advancement, HP/resource mutation, rules-source lookup, and audit logging to a deterministic `dnd5e-dm` command.
 
-**Tech Stack:** Markdown skill docs, Python 3 standard library, JSON/JSONL campaign state, pytest tests, shell CLI commands.
+**Tech Stack:** Markdown skill docs written in Chinese, Go standard library, JSON/JSONL campaign state, Go unit tests, shell CLI smoke commands.
 
 ---
 
@@ -16,13 +16,14 @@
 - Create: `.agents/skills/dnd5e-dm/references/campaign-vault-schema.md` — required campaign vault files and schemas.
 - Create: `.agents/skills/dnd5e-dm/references/dm-workflow.md` — mode-specific workflows for setup, prep, live play, combat, rules adjudication, and recap.
 - Create: `.agents/skills/dnd5e-dm/references/rules-source-policy.md` — source/copyright policy and canon/homebrew labeling rules.
-- Create: `.agents/skills/dnd5e-dm/scripts/dice.py` — dice parser and roller.
-- Create: `.agents/skills/dnd5e-dm/scripts/roll.py` — CLI wrapper for dice rolls and `roll_log.jsonl` append.
-- Create: `.agents/skills/dnd5e-dm/scripts/initiative.py` — initiative creation and sorting.
-- Create: `.agents/skills/dnd5e-dm/scripts/combat.py` — turn advancement, action economy, HP damage/healing, concentration/death-save hooks.
-- Create: `.agents/skills/dnd5e-dm/scripts/resources.py` — spend/restore character resources.
-- Create: `.agents/skills/dnd5e-dm/scripts/conditions.py` — add/remove/list conditions.
-- Create: `.agents/skills/dnd5e-dm/scripts/check.py` — attack/check/save helper using dice.
+- Create: `cli/go.mod` — Go module definition.
+- Create: `cli/cmd/dnd5e-dm/main.go` — binary CLI entrypoint.
+- Create: `cli/internal/dice/` — dice parser and roller.
+- Create: `cli/internal/audit/` — JSONL audit log writer.
+- Create: `cli/internal/combat/` — turn advancement, action economy, HP damage/healing, concentration/death-save hooks.
+- Create: `cli/internal/resources/` — spend/restore character resources.
+- Create: `cli/internal/conditions/` — add/remove/list conditions.
+- Create: `cli/internal/rules/` — local SRD/CC and user-provided rules search.
 - Create: `.agents/skills/dnd5e-dm/evals/evals.json` — initial human-review test prompts.
 - Create: `tests/dnd5e_dm/test_dice.py` — dice parser/roller tests.
 - Create: `tests/dnd5e_dm/test_roll_cli.py` — roll logging tests.

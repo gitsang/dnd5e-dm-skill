@@ -6,9 +6,9 @@ Design a `dnd5e-dm` skill that helps an AI assistant run or assist a Dungeons & 
 
 ## Recommended Approach
 
-Use a **Skill + Campaign Vault + Tool Scripts** architecture.
+Use a **Skill + Campaign Vault + Go Binary CLI** architecture.
 
-The skill provides the operating protocol. A local campaign directory stores persistent state. Small deterministic scripts handle dice, initiative, combat state transitions, resource spending, and audit logs. This gives better reliability than a prompt-only skill without requiring a complete DnD rules engine from day one.
+The skill provides the operating protocol. A local campaign directory stores persistent state. A deterministic Go CLI handles dice, initiative, combat state transitions, resource spending, rules-source lookup, and audit logs. This gives better reliability than a prompt-only skill without requiring a complete DnD rules engine from day one.
 
 ## Non-Goals
 
@@ -22,17 +22,23 @@ The skill provides the operating protocol. A local campaign directory stores per
 ```text
 dnd5e-dm/
   SKILL.md
-  scripts/
-    roll.py
-    initiative.py
-    combat.py
-    resources.py
-    conditions.py
-    check.py
+  bin/
+    dnd5e-dm
   references/
     campaign-vault-schema.md
     dm-workflow.md
     rules-source-policy.md
+  cli/
+    go.mod
+    cmd/dnd5e-dm/
+      main.go
+    internal/
+      audit/
+      combat/
+      conditions/
+      dice/
+      resources/
+      rules/
 ```
 
 Per campaign, the skill expects a campaign vault:
@@ -141,9 +147,9 @@ The skill must check `combat_state.json` before allowing a declared action. It m
 
 ## Randomness
 
-All randomness must come from a script, not the LLM.
+All randomness must come from the Go CLI, not the LLM.
 
-`roll.py` should support common dice notation:
+`dnd5e-dm roll` should support common dice notation:
 
 ```text
 1d20+5
@@ -186,11 +192,13 @@ Before generating plot developments, NPC behavior, encounters, or clues, the ski
 - `dm_improvised`
 - `homebrew`
 
-Official monster existence and stat blocks must not be guessed. If a monster stat block is not present in `monster_statblocks/` or an approved source, the skill should request or require the source, suggest an SRD-compatible alternative, or clearly mark generated content as homebrew.
+Official monster existence and stat blocks must not be guessed. If a monster stat block is not present in `monster_statblocks/`, SRD/CC references, or another user-approved local source, the skill should request or require the source, suggest an SRD-compatible alternative, or clearly mark generated content as homebrew.
 
 ## Source and Copyright Policy
 
-The skill may use SRD-compatible rules and user-provided campaign materials. It should not reproduce non-SRD copyrighted text or pretend to know exact non-SRD stat blocks. If the user supplies a module or stat block, the skill may index and reference it for the user's game.
+The skill may use SRD-compatible or Creative Commons rules and user-provided campaign materials. It should not reproduce non-SRD copyrighted text, connect to unofficial external sources by default, or pretend to know exact non-SRD stat blocks. If the user supplies a module or stat block, the skill may index and reference it for the user's game.
+
+Default rules-source policy: use SRD/CC plus user-provided local files only. External sources such as D&D Beyond are out of scope for the default implementation because they introduce account, copyright, and terms-of-service constraints.
 
 ## Hidden Information
 
