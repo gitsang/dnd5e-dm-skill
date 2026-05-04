@@ -2,6 +2,8 @@
 
 Campaign vault 是状态真相。进行机械或连续性敏感判断前，先读取相关文件。
 
+首次创建这些文件时，先按 `setup.md` 执行；本文件只定义结构和字段含义。
+
 ```text
 campaigns/<campaign-name>/
   campaign_config.json

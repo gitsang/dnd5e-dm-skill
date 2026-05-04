@@ -30,9 +30,12 @@ description: Use when the user wants to run, prepare, adjudicate, audit, or cont
 
 然后读取相关参考：
 
+- `references/setup.md`：首次安装 CLI、初始化战役资料库、建卡、导入 SRD/CC 和用户资料。
 - `references/campaign-vault-schema.md`：创建或读取战役状态。
 - `references/dm-workflow.md`：各模式流程。
 - `references/rules-source-policy.md`：使用规则、模组、怪物、法术或职业资料前必须检查。
+
+如果用户第一次使用、没有 campaign vault、没有 `dnd5e-dm` 命令、没有角色 JSON，或询问“怎么开始/怎么安装/怎么导入规则”，必须先执行 setup 流程。
 
 ## 机械安全门
 
