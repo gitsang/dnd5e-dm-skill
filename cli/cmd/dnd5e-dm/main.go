@@ -10,7 +10,13 @@ import (
 	"time"
 
 	"github.com/gitsang/dnd5e-dm-skill/cli/internal/audit"
+	"github.com/gitsang/dnd5e-dm-skill/cli/internal/check"
+	"github.com/gitsang/dnd5e-dm-skill/cli/internal/combat"
+	"github.com/gitsang/dnd5e-dm-skill/cli/internal/conditions"
 	"github.com/gitsang/dnd5e-dm-skill/cli/internal/dice"
+	"github.com/gitsang/dnd5e-dm-skill/cli/internal/initiative"
+	"github.com/gitsang/dnd5e-dm-skill/cli/internal/resources"
+	"github.com/gitsang/dnd5e-dm-skill/cli/internal/rules"
 )
 
 func main() {
@@ -18,15 +24,36 @@ func main() {
 		printUsage()
 		return
 	}
-	if os.Args[1] == "roll" {
+	switch os.Args[1] {
+	case "roll":
 		if err := runRoll(os.Args[2:]); err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)
 		}
 		return
+	case "check":
+		exitOnError(runCheck(os.Args[2:]))
+	case "initiative":
+		exitOnError(runInitiative(os.Args[2:]))
+	case "combat":
+		exitOnError(runCombat(os.Args[2:]))
+	case "resources":
+		exitOnError(runResources(os.Args[2:]))
+	case "conditions":
+		exitOnError(runConditions(os.Args[2:]))
+	case "rules":
+		exitOnError(runRules(os.Args[2:]))
 	}
 	fmt.Fprintf(os.Stderr, "unknown command: %s\n", os.Args[1])
 	os.Exit(2)
+}
+
+func exitOnError(err error) {
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
+	os.Exit(0)
 }
 
 type rollLogEntry struct {
@@ -119,6 +146,151 @@ func moveRollExpressionLast(args []string) ([]string, error) {
 		reordered = append(reordered, expression)
 	}
 	return reordered, nil
+}
+
+func runCheck(args []string) error {
+	flags := flag.NewFlagSet("check", flag.ContinueOnError)
+	flags.SetOutput(os.Stderr)
+	expression := flags.String("expression", "", "dice expression")
+	dc := flags.Int("dc", 0, "difficulty class")
+	reason := flags.String("reason", "", "reason")
+	seed := flags.Int64("seed", 0, "deterministic seed")
+	if err := flags.Parse(args); err != nil {
+		return err
+	}
+	var rng *rand.Rand
+	if *seed != 0 {
+		rng = rand.New(rand.NewSource(*seed))
+	}
+	result, err := check.Roll(*expression, *dc, *reason, rng)
+	if err != nil {
+		return err
+	}
+	return json.NewEncoder(os.Stdout).Encode(result)
+}
+
+func runInitiative(args []string) error {
+	flags := flag.NewFlagSet("initiative", flag.ContinueOnError)
+	flags.SetOutput(os.Stderr)
+	combatantsJSON := flags.String("combatants", "", "combatants JSON")
+	out := flags.String("out", "", "output combat_state.json")
+	seed := flags.Int64("seed", 0, "deterministic seed")
+	if err := flags.Parse(args); err != nil {
+		return err
+	}
+	var inputs []initiative.InputCombatant
+	if err := json.Unmarshal([]byte(*combatantsJSON), &inputs); err != nil {
+		return err
+	}
+	var rng *rand.Rand
+	if *seed != 0 {
+		rng = rand.New(rand.NewSource(*seed))
+	}
+	state, err := initiative.Create(inputs, rng)
+	if err != nil {
+		return err
+	}
+	if *out != "" {
+		if err := combat.Save(*out, state); err != nil {
+			return err
+		}
+	}
+	return json.NewEncoder(os.Stdout).Encode(state)
+}
+
+func runCombat(args []string) error {
+	if len(args) == 0 {
+		return fmt.Errorf("combat requires a subcommand")
+	}
+	flags := flag.NewFlagSet("combat "+args[0], flag.ContinueOnError)
+	flags.SetOutput(os.Stderr)
+	state := flags.String("state", "", "combat_state.json")
+	combatant := flags.String("combatant", "", "combatant id")
+	kind := flags.String("kind", "", "action kind")
+	amount := flags.Int("amount", 0, "amount")
+	if err := flags.Parse(args[1:]); err != nil {
+		return err
+	}
+	switch args[0] {
+	case "use":
+		return combat.Use(*state, *combatant, *kind)
+	case "damage":
+		return combat.Damage(*state, *combatant, *amount)
+	case "next-turn":
+		return combat.NextTurn(*state)
+	default:
+		return fmt.Errorf("unknown combat subcommand: %s", args[0])
+	}
+}
+
+func runResources(args []string) error {
+	if len(args) == 0 {
+		return fmt.Errorf("resources requires a subcommand")
+	}
+	flags := flag.NewFlagSet("resources "+args[0], flag.ContinueOnError)
+	flags.SetOutput(os.Stderr)
+	character := flags.String("character", "", "character JSON")
+	path := flags.String("path", "", "resource path")
+	amount := flags.Int("amount", 0, "amount")
+	if err := flags.Parse(args[1:]); err != nil {
+		return err
+	}
+	switch args[0] {
+	case "spend":
+		return resources.Spend(*character, *path, *amount)
+	case "restore":
+		return resources.Restore(*character, *path, *amount)
+	default:
+		return fmt.Errorf("unknown resources subcommand: %s", args[0])
+	}
+}
+
+func runConditions(args []string) error {
+	if len(args) == 0 {
+		return fmt.Errorf("conditions requires a subcommand")
+	}
+	flags := flag.NewFlagSet("conditions "+args[0], flag.ContinueOnError)
+	flags.SetOutput(os.Stderr)
+	state := flags.String("state", "", "combat_state.json")
+	combatant := flags.String("combatant", "", "combatant id")
+	condition := flags.String("condition", "", "condition name")
+	source := flags.String("source", "", "condition source")
+	duration := flags.String("duration", "", "condition duration")
+	if err := flags.Parse(args[1:]); err != nil {
+		return err
+	}
+	switch args[0] {
+	case "add":
+		return conditions.Add(*state, *combatant, *condition, *source, *duration)
+	case "remove":
+		return conditions.Remove(*state, *combatant, *condition)
+	case "list":
+		items, err := conditions.List(*state, *combatant)
+		if err != nil {
+			return err
+		}
+		return json.NewEncoder(os.Stdout).Encode(items)
+	default:
+		return fmt.Errorf("unknown conditions subcommand: %s", args[0])
+	}
+}
+
+func runRules(args []string) error {
+	if len(args) == 0 || args[0] != "search" {
+		return fmt.Errorf("rules supports: search")
+	}
+	flags := flag.NewFlagSet("rules search", flag.ContinueOnError)
+	flags.SetOutput(os.Stderr)
+	rulesDir := flags.String("rules-dir", "", "rules directory")
+	query := flags.String("query", "", "query")
+	if err := flags.Parse(args[1:]); err != nil {
+		return err
+	}
+	results, err := rules.Search(strings.Split(*rulesDir, ","), *query)
+	if err != nil {
+		return err
+	}
+	return json.NewEncoder(os.Stdout).Encode(results)
 }
 
 func printUsage() {

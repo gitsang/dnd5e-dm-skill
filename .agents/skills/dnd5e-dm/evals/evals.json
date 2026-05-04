@@ -1,0 +1,29 @@
+{
+  "skill_name": "dnd5e-dm",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "我正在跑 DnD5e 2014，玩家和两个 goblin 进入战斗。请作为 DM 建立先攻、公开 roll 点，并说明第一回合当前角色还能使用哪些行动经济。",
+      "expected_output": "使用 dnd5e-dm CLI 建立先攻和骰点，不编造隐藏状态，并显示 Action、Bonus Action、Reaction、Movement 状态。",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "战士本回合已经 Attack 了，现在他说还要再 Dash。请按 5e 行动经济裁定。",
+      "expected_output": "把 Dash 分类为 Action，检查 action 是否已使用；若无具体特性授予额外 Action，则拒绝。",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "我想在官方模组里加入一个 Mind Flayer 伏击，但资料库里没有它的 stat block。你作为 DM assistant 应该怎么处理？",
+      "expected_output": "不编造官方 stat block；要求批准来源，建议 SRD/CC 替代，或清楚标记为 homebrew。",
+      "files": []
+    },
+    {
+      "id": 4,
+      "prompt": "玩家跳过了模组关键线索，直接离开村庄。帮我即兴处理，但不要偏离主线，也不要直接泄露秘密。",
+      "expected_output": "检查模组目标，保护隐藏信息，引入 derived_from_module 或 dm_improvised 钩子，并标记偏离风险。",
+      "files": []
+    }
+  ]
+}
