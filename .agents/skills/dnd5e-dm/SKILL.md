@@ -13,7 +13,7 @@ description: Use when the user wants to run, prepare, adjudicate, audit, or cont
 
 - 以 campaign vault 文件为唯一状态真相；不要依赖对话记忆判断 HP、资源、先攻、状态、线索、NPC 状态或模组事实。
 - 骰子、先攻、行动经济、HP、资源、状态、检定和审计日志必须使用 `dnd5e-dm` Go CLI。
-- 官方规则默认只使用 SRD/Creative Commons 与用户提供的本地资料。
+- 官方规则默认只使用通过 `git clone https://github.com/oldmanumby/dnd.srd.git` 获取的 SRD/Creative Commons 与用户提供的本地资料。
 - 不得编造非 SRD 官方规则、怪物 stat block、模组事实或隐藏信息。
 - 玩家角色的行动、情绪、台词和意图由玩家决定；DM 只描述可感知信息与后果。
 
@@ -30,7 +30,7 @@ description: Use when the user wants to run, prepare, adjudicate, audit, or cont
 
 然后读取相关参考：
 
-- `references/setup.md`：首次安装 CLI、初始化战役资料库、建卡、导入 SRD/CC 和用户资料。
+- `references/setup.md`：首次安装 CLI、初始化战役资料库、建卡、通过 clone `oldmanumby/dnd.srd` 导入 SRD/CC 和用户资料。
 - `references/campaign-vault-schema.md`：创建或读取战役状态。
 - `references/dm-workflow.md`：各模式流程。
 - `references/rules-source-policy.md`：使用规则、模组、怪物、法术或职业资料前必须检查。

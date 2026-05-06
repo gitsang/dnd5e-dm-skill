@@ -131,10 +131,15 @@ dnd5e-dm initiative \
 
 ## 5. 获取与导入 SRD/CC 规则
 
-默认规则来源是 SRD/Creative Commons 与用户提供本地资料。推荐流程：
+默认规则来源是通过 `git clone https://github.com/oldmanumby/dnd.srd.git` 获取的 SRD/Creative Commons 与用户提供本地资料。推荐流程：
 
-1. 从官方或合法镜像下载 SRD/CC 文本；保留来源 URL、版本、许可说明。
-2. 按主题拆成 Markdown 或 JSON，放入 `rules_refs/`，例如：
+1. 克隆 SRD 仓库到本地引用区，保留仓库 URL、commit hash、版本和许可说明：
+
+```bash
+git clone https://github.com/oldmanumby/dnd.srd.git campaigns/demo/rules_refs/dnd.srd
+```
+
+2. 按主题使用仓库内 Markdown/JSON，或从克隆仓库整理到 `rules_refs/`，例如：
    - `rules_refs/actions.md`
    - `rules_refs/conditions.md`
    - `rules_refs/spells-srd.md`
@@ -144,8 +149,9 @@ dnd5e-dm initiative \
 ```md
 # Conditions
 
-Source: SRD 5.1 / Creative Commons, user-approved local reference.
+Source: https://github.com/oldmanumby/dnd.srd.git, SRD 5.1 / Creative Commons, user-approved local reference.
 License: CC-BY-4.0 if applicable.
+Commit: <commit-hash>
 ```
 
 4. 用 CLI 搜索验证：
