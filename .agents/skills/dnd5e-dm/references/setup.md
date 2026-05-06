@@ -8,7 +8,7 @@
 
 ```bash
 cd cli
-go build -o ../.agents/skills/dnd5e-dm/bin/dnd5e-dm ./cmd/dnd5e-dm
+go build -o ./.agents/skills/dnd5e-dm/bin/dnd5e-dm ./cmd/dnd5e-dm
 ```
 
 如果用户希望全局可用，把二进制复制到 PATH 中的目录：
@@ -89,19 +89,26 @@ touch campaigns/demo/roll_log.jsonl campaigns/demo/campaign_log.md campaigns/dem
   "id": "pc1",
   "name": "Aric",
   "level": 3,
-  "classes": [{"name": "fighter", "level": 3}],
+  "classes": [{ "name": "fighter", "level": 3 }],
   "species": "human",
   "background": "soldier",
   "ac": 16,
   "hp": 24,
   "max_hp": 28,
   "temp_hp": 0,
-  "abilities": {"str": 16, "dex": 12, "con": 14, "int": 10, "wis": 11, "cha": 8},
+  "abilities": {
+    "str": 16,
+    "dex": 12,
+    "con": 14,
+    "int": 10,
+    "wis": 11,
+    "cha": 8
+  },
   "proficiency_bonus": 2,
-  "skills": {"athletics": 5},
-  "saves": {"str": 5, "con": 4},
-  "passives": {"perception": 10, "investigation": 10, "insight": 10},
-  "resources": {"action_surge": 1, "hit_dice_d10": 3},
+  "skills": { "athletics": 5 },
+  "saves": { "str": 5, "con": 4 },
+  "passives": { "perception": 10, "investigation": 10, "insight": 10 },
+  "resources": { "action_surge": 1, "hit_dice_d10": 3 },
   "spell_slots": {},
   "conditions": [],
   "equipment": ["longsword", "shield", "chain mail"]
