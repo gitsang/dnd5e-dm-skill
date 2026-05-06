@@ -1,32 +1,8 @@
-# Setup：安装 CLI、初始化战役、建卡与导入规则
+# Setup：初始化战役、建卡与导入规则
 
-首次使用、换新战役、缺少 JSON 状态文件、缺少 SRD/CC 资料或用户问“怎么开始”时，先按本文执行。
+首次使用、换新战役、缺少 JSON 状态文件、缺少 SRD/CC 资料或用户问“怎么开始”时，先按本文执行。安装依赖和 CLI 构建见 `prerequisite.md`。
 
-## 1. 安装或构建 CLI
-
-在本仓库根目录构建：
-
-```bash
-cd cli
-go build -o ./.agents/skills/dnd5e-dm/bin/dnd5e-dm ./cmd/dnd5e-dm
-```
-
-如果用户希望全局可用，把二进制复制到 PATH 中的目录：
-
-```bash
-mkdir -p ~/.local/bin
-cp .agents/skills/dnd5e-dm/bin/dnd5e-dm ~/.local/bin/dnd5e-dm
-```
-
-验证：
-
-```bash
-dnd5e-dm --help
-```
-
-如果 `go` 不存在，先让用户安装 Go；不要改用 LLM 掷骰或手写随机结果替代 CLI。
-
-## 2. 初始化 campaign vault
+## 1. 初始化 campaign vault
 
 为每个战役创建独立目录。示例：
 
@@ -80,7 +56,7 @@ touch campaigns/demo/roll_log.jsonl campaigns/demo/campaign_log.md campaigns/dem
 }
 ```
 
-## 3. 建立角色 JSON
+## 2. 建立角色 JSON
 
 每个 PC 一个文件：`characters/<pc-id>.json`。至少记录会影响裁定的机械字段。
 
@@ -117,7 +93,7 @@ touch campaigns/demo/roll_log.jsonl campaigns/demo/campaign_log.md campaigns/dem
 
 不要把缺失字段靠记忆补齐。缺少角色卡数据时，向用户索取或标记为未知。
 
-## 4. 初始化战斗状态
+## 3. 初始化战斗状态
 
 进入战斗前，用 CLI 生成或更新 `combat_state.json`：
 
@@ -129,7 +105,7 @@ dnd5e-dm initiative \
 
 战斗中所有行动经济、伤害、状态变化都通过 CLI 或等价的文件修改流程记录，不能只写在对话里。
 
-## 5. 获取与导入 SRD/CC 规则
+## 4. 获取与导入 SRD/CC 规则
 
 默认规则来源是通过 `git clone https://github.com/oldmanumby/dnd.srd.git` 获取的 SRD/Creative Commons 与用户提供本地资料。推荐流程：
 
@@ -162,14 +138,14 @@ dnd5e-dm rules search --rules-dir campaigns/demo/rules_refs --query grapple
 
 未导入的规则、怪物、法术或职业特性视为“资料缺失”。不要凭模型记忆当作官方文本复述。
 
-## 6. 导入模组、怪物与用户资料
+## 5. 导入模组、怪物与用户资料
 
 - 模组正文或用户摘录放入 `module_canon/`。
 - 模组结构化索引写入 `module_index.json`。
 - 用户批准的怪物 stat block 放入 `monster_statblocks/`。
 - 即兴内容和偏离原因写入 `dm_improv.md`，并标记 `derived_from_module`、`dm_improvised` 或 `homebrew`。
 
-## 7. Setup 完成检查
+## 6. Setup 完成检查
 
 - `dnd5e-dm --help` 可运行。
 - `campaign_config.json`、`party.json`、`world_state.json`、`module_index.json` 存在。
